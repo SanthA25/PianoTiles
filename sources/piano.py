@@ -2,8 +2,31 @@ import pygame
 import time
 import random
 from pygame.locals import*
+from oled import OLED
+from oled import Font
+from oled import Graphics
 
-# Definimos los distintos colores
+# Connect to the OLED display on /dev/i2c-0
+dis = OLED(1)
+
+# Start communication
+dis.begin()
+
+# Start basic initialization
+dis.initialize()
+
+# Do additional configuration
+dis.set_memory_addressing_mode(0)
+dis.set_column_address(0, 127)
+dis.set_page_address(0, 7)
+
+# Clear display
+dis.clear()
+
+# Set font scale x2
+f = Font(2)
+
+# Se definenen los colores --------------------------
 tile_color = (112, 231, 255)
 border_color = (255, 255, 255)
 push_tile_color = (253, 202, 64)
@@ -11,6 +34,7 @@ background_color = (14, 36, 68)
 title_color = (226, 132, 19)
 txt_color = (216 , 231, 233)
 
+# Se agregan las canciones a la playlist
 playList = ["Naruto - Sadness and Sorrow.mp3",
             "Black Catcher - Vickeblanka.mp3",
             "Tokyo Ghoul OP - Unravel.mp3",
@@ -19,8 +43,9 @@ playList = ["Naruto - Sadness and Sorrow.mp3",
 clock = pygame.time.Clock()
 score = 0
 
+# Se crea el objeto Tile
 class Tile:
-    
+    #Constructor
     def __init__(self, pos_x1, pos_y1, pos_x2, pos_y2, bck_color, speed, id_value , disp):
         
         self.pos_x1 = pos_x1
@@ -39,10 +64,13 @@ class Tile:
         
         self.tile = Rect(self.pos_x1, self.pos_y1, self.pos_x2, self.pos_y2)
     
+    
+    # Metodo para desplegar en pantalla
     def create(self):
         
         pygame.draw.rect(self.disp, self.bck_color, self.tile)
     
+    # Si se presiona correctamente, cambia color y suma puntos
     def press(self):
         
         global score
@@ -50,10 +78,12 @@ class Tile:
         self.bck_color = push_tile_color
         score = score + 2
     
+    # No se presiono, se mantiene igual
     def not_pressed(self):
         
         self.bck_color = tile_color
     
+    # Actualiza cada Tile
     def upd(self):
         
         self.tile.update(self.pos_x1, 0, self.pos_x2, 180)
@@ -62,10 +92,12 @@ class Tile:
         
         self.not_pressed()
     
+    # Desplazamiento de cada Tile en su respectiva columna
     def shift(self):
         
         h = self.disp.get_height()
         
+        # Se desplazan mientras no sobrepasen el borde inferior del juego
         while(self.tile.top <= h):
             
             self.disp.fill(background_color)
@@ -79,6 +111,7 @@ class Tile:
             
             pygame.draw.rect(self.disp, self.bck_color, self.tile)
             
+            # Compara las teclas presionadas con los Tiles y sus columnas (ID)
             for Event in pygame.event.get():
             
                 if(Event.type == pygame.KEYDOWN):
@@ -132,14 +165,19 @@ class Tile:
                     if(Event.key == pygame.K_f):
                     
                         self.not_pressed()
-                
+                        
             pygame.display.flip()
             clock.tick(60)
         
         self.upd()
-            
+
+# Inicializa el juego
 def start_game():
     
+    global score
+    currScore, prevScore = 0, 0
+    
+    # Pantalla principal e inicializacion de variables
     width = 400
     height = 500
     
@@ -196,8 +234,10 @@ def start_game():
                         
                         level = 3
     
+    # carga la cancion dependiendo del nivel
     mp3.load(playList[level])
     
+    # Se selecciona el nivel
     if(level == 0):
         
         speed = 10
@@ -214,16 +254,16 @@ def start_game():
         
         speed = 25
         
-    
+    # Se crean 4 objetod de tipo Tile para las 4 columnas
     t1 = Tile(  0, 0, 100, 180, tile_color, speed, "a", disp)
     t2 = Tile(100, 0, 100, 180, tile_color, speed, "s", disp)
     t3 = Tile(200, 0, 100, 180, tile_color, speed, "d", disp)
     t4 = Tile(300, 0, 100, 180, tile_color, speed, "f", disp)
-
+    
+    # Se crea una lista de tipo Tile
     tile_list = [t1, t2, t3, t4]
     
-    for t in tile_list:
-            
+    for t in tile_list:          
         t.create()
     
     # Se reproduce la cancion
@@ -232,19 +272,28 @@ def start_game():
     
     time.sleep(2)
     
+    # Se agregan Tiles de manera aleatoria al juego
     while status:
         
+        # Despliega el puntaje en la OLED
+        f.print_string(60, 15, str(score))
+        dis.update()
+        
+        # Agrega Tiles aleatoreamente
         t = random.choice(tile_list)
         t.shift()
         status = mp3.get_busy()
+        # Limpia la OLED
+        dis.clear()
         
-    
+# Fin del juego e imprime el puntaje final 
 def game_over():
     
     global score
     
     print(score)
     pygame.quit()
+    
 
 start_game()
 game_over()
