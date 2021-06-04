@@ -1,0 +1,2 @@
+cd "/home/pi/Documents/TE2003/Piano"
+python3 piano.py
