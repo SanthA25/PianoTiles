@@ -29,6 +29,9 @@ Si se llega a presionar una letra equivocada o se presiona una columna cuando no
 
 El puntaje se desplegará a un OLED display 128x62, el cual funciona por I2C. De la misma manera, un LED estará parpadeando a la misma velocidad que se haya seleccionado la dificultad del juego.
 
+Todos los archivos de la carpeta *sources* deben permancer ahí.
+El archivo de la carpeta *deskFile* se debe mover al escritorio, ya que este representa el acceso directo al juego.
+
 ### _VIDEO DEMO_ [PyTiles](https://youtu.be/mjjx0b9AaOU)
 
 ![pyTILES](https://user-images.githubusercontent.com/70683976/120878150-26a89400-c580-11eb-8ae9-b24986b29e4a.png)
