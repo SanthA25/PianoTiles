@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type = Application
+Name = Calculadora
+Exec = "/home/pi/Desktop/PyTiles/PianoTiles/sources/piano_dir"
+Icon = /home/pi/Desktop/PyTiles/PianoTiles/sources/ico.jpg
+Terminal = false(tried true)
+Comment = "PyTiles Game"
