@@ -1,10 +1,16 @@
 import pygame
 import time
 import random
+import RPi.GPIO as GPIO
 from pygame.locals import*
 from oled import OLED
 from oled import Font
 from oled import Graphics
+
+ledPin = 7
+GPIO.setmode(GPIO.BOARD) 
+GPIO.setwarnings(False)
+GPIO.setup(ledPin,GPIO.OUT)
 
 # Connect to the OLED display on /dev/i2c-0
 dis = OLED(1)
@@ -100,6 +106,9 @@ class Tile:
         # Se desplazan mientras no sobrepasen el borde inferior del juego
         while(self.tile.top <= h):
             
+            # El LED parpadea dependiendo de la velocidad de cada Tile
+            GPIO.output(ledPin, GPIO.HIGH) #LED ON
+            
             self.disp.fill(background_color)
             
             pygame.draw.line(self.disp, border_color,(100,0),(100,500))
@@ -170,6 +179,14 @@ class Tile:
             clock.tick(60)
         
         self.upd()
+        GPIO.output(ledPin, GPIO.LOW) #LED OF
+
+# def blinkLED(speedL):
+#     GPIO.output(ledPin, GPIO.HIGH) #LED ON
+#     time.sleep(speedL)
+#     GPIO.output(ledPin, GPIO.LOW) #LED OF
+#     time.sleep(speedL)
+    
 
 # Inicializa el juego
 def start_game():
@@ -236,6 +253,10 @@ def start_game():
     
     # carga la cancion dependiendo del nivel
     mp3.load(playList[level])
+#     song = MP3(playList[level])
+#     songLength = sonf.info.length
+    a = pygame.mixer.Sound(playList[level])
+    print(a.get_length())
     
     # Se selecciona el nivel
     if(level == 0):
@@ -274,7 +295,7 @@ def start_game():
     
     # Se agregan Tiles de manera aleatoria al juego
     while status:
-        
+                
         # Despliega el puntaje en la OLED
         f.print_string(60, 15, str(score))
         dis.update()

@@ -1,2 +1,2 @@
-cd "/home/pi/Documents/TE2003/Piano"
+cd "/home/pi/Desktop/PyTiles/PianoTiles/sources"
 python3 piano.py
